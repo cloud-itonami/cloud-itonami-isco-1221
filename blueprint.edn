@@ -1,0 +1,11 @@
+[{:itonami.blueprint/id "cloud-itonami-isco-1221"
+  :itonami.blueprint/name "Community Sales & Marketing Management"
+  :itonami.blueprint/isco-08 "1221"
+  :itonami.blueprint/domain :business/sales-marketing-management
+  :itonami.blueprint/license "AGPL-3.0-or-later"
+  :itonami.blueprint/social-impact [:fair-dealing :local-business-presence :local-jobs]
+  :itonami.blueprint/governor :sales-marketing-management-governor
+  :itonami.blueprint/robotics true
+  :itonami.blueprint/required-technologies [:robotics :identity :forms :dmn :bpmn :audit-ledger]
+  :itonami.blueprint/status :public-oss
+  :db/id -1}]
