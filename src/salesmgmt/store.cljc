@@ -46,3 +46,33 @@
   ([] (mem-store {}))
   ([seed] (->MemStore (atom (merge {:clients {} :products {} :records [] :ledger []}
                                    seed)))))
+
+;; ----------------------------- deterministic demo seed -----------------------------
+
+(defn- demo-data
+  "The demo client/product set. Deterministic -- no clock, no rand, no
+  I/O -- so every caller (tests, the OS console, a sim run) sees the
+  same store and a diff in behaviour is a diff in the actor.
+
+  `P-2` exists so the governor's arithmetic HARD rules have something
+  real to refuse: its registered ceiling and floor are tight enough
+  that an over-ceiling rate and a below-floor price are both
+  expressible. A seed that only contains the happy path cannot show a
+  gate working."
+  []
+  {:clients
+   {"client-1" {:client-id "client-1" :name "Kobo Trade"}
+    "client-2" {:client-id "client-2" :name "Awai Foods"}}
+   :products
+   {"P-1" {:product-id "P-1" :client-id "client-1" :name "widget"
+           :list-price 10000 :price-floor 7000 :discount-ceiling 20}
+    "P-2" {:product-id "P-2" :client-id "client-1" :name "gadget"
+           :list-price 5000 :price-floor 4500 :discount-ceiling 5}
+    "P-3" {:product-id "P-3" :client-id "client-2" :name "sauce"
+           :list-price 1200 :price-floor 900 :discount-ceiling 15}}})
+
+(defn seed-db
+  "A MemStore seeded with the demo client/product set. The
+  deterministic default."
+  []
+  (mem-store (demo-data)))

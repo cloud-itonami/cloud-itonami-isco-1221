@@ -27,8 +27,15 @@
   "Build a compiled SalesMarketingManagementActor graph. `store` implements
   `salesmgmt.store/Store`. `advisor` implements
   `salesmgmt.advisor/Advisor` (defaults to `mock-advisor`).
-  `checkpointer` defaults to an in-memory one."
-  [{:keys [store advisor checkpointer]
+  `checkpointer` defaults to an in-memory one.
+
+  `phase-gate` is optional: `(fn [request context verdict base-disposition]
+  -> {:disposition :commit|:escalate|:hold :reason kw|nil})`. It can only
+  add caution -- see `salesmgmt.phase/gate`, which is the gate
+  `salesmgmt.operation/build` injects here. When it is absent (the
+  default) `:decide` behaves exactly as it did before the phase seam
+  existed, which is what the pre-phase tests in `actor_test` pin."
+  [{:keys [store advisor checkpointer phase-gate]
     :or {advisor (advisor/mock-advisor)
          checkpointer (cp/mem-checkpointer)}}]
   (-> (g/state-graph
@@ -52,11 +59,24 @@
                        {:verdict v
                         :audit [{:node :govern :verdict v}]})))
       (g/add-node :decide
-                   (fn [{:keys [verdict]}]
-                     {:disposition (cond
-                                     (:hard? verdict) :hold
-                                     (:escalate? verdict) :request-approval
-                                     :else :commit)}))
+                   (fn [{:keys [request context verdict]}]
+                     ;; The governor decides first; `phase-gate` may then only
+                     ;; ADD caution (commit -> escalate/hold), never remove it.
+                     ;; Absent a gate this is byte-for-byte the original rule.
+                     (let [base (cond
+                                  (:hard? verdict) :hold
+                                  (:escalate? verdict) :escalate
+                                  :else :commit)
+                           {:keys [disposition reason]}
+                           (if phase-gate
+                             (phase-gate request context verdict base)
+                             {:disposition base :reason nil})]
+                       (cond-> {:disposition (if (= :escalate disposition)
+                                               :request-approval
+                                               disposition)}
+                         reason (assoc :audit [{:node :decide
+                                                :phase-reason reason
+                                                :governor-disposition base}])))))
       (g/add-node :request-approval (fn [s] s))
       (g/add-node :commit
                    (fn [{:keys [request proposal]}]
