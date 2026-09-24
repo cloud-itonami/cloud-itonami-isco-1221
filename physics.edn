@@ -1,0 +1,33 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:physics` runs it.
+;;
+;; The README declares sales and marketing management (ISCO 1221) a wave-1
+;; "design & governance" occupation with no robotics gate: the core work is
+;; cognitive. The residual physical work a robot would do for a sales team is
+;; trade-show logistics: bringing sample cases from the hall's storage area
+;; to the booth, and setting product samples onto the display plinth.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isco-1221"
+ :cases
+ [{:id :sample-case-to-booth
+   :kind :transport
+   :procedure "booth robot brings a trolley of product sample cases from the exhibition hall's storage area to the booth over carpet; distance to storage swept"
+   :params {:mass-kg 60.0 :payload-kg 35.0 :v-max-mps 1.0 :a-max-mps2 0.5
+            :brake-decel-mps2 0.8 :drive-force-n 120.0 :crr 0.03
+            :cog-height-m 0.55 :support-half-length-m 0.30 :max-time-s 1800.0}
+   :sweep {:param :distance-m :values [50.0 100.0 200.0 300.0 450.0]}
+   :quantity :cycle-time-s
+   :limit {:max 300.0 :basis "estimate: a restock trip inside the 5-minute gap between booth demonstrations"}
+   :boundary {:lo 20.0 :hi 800.0}}
+  {:id :sample-onto-plinth
+   :kind :manipulator
+   :procedure "arm lifts a boxed product sample from the trolley onto the display plinth at eye height"
+   :params {:l1-m 0.55 :l2-m 0.50 :m1-kg 5.0 :m2-kg 3.5
+            :from [0.60 0.00] :to [0.40 0.80] :duration-s 2.0 :steps 400}
+   :sweep {:param :payload-kg :values [1.0 3.0 5.0 8.0 12.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 110.0 :basis "estimate: continuous shoulder torque of a ~10 kg-payload collaborative arm"}
+   :boundary {:lo 0.2 :hi 40.0}}]}
