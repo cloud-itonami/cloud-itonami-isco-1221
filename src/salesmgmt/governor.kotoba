@@ -1,7 +1,7 @@
 (ns salesmgmt.governor
   "SalesMarketingManagementGovernor — the independent safety/
   traceability layer for the ISCO-08 1221 community sales-management
-  actor (itonami actor pattern, ADR-2607011000 / CLAUDE.md Actors
+  actor (itonami actor pattern, ADR-2607011000 / AGENTS.md Actors
   section). Modeled on cloud-itonami-isco-4311's bookkeeping.governor.
   Sales-management twist: the discount ceiling and the price floor are
   REGISTERED numbers checked deterministically — an authority table is
