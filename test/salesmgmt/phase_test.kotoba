@@ -2,7 +2,7 @@
   "The phase gate has to be shown REFUSING, and refusing for the reason
   it names -- a test that only asserts the final disposition counts a
   run that failed for an unrelated cause as a working gate
-  (CLAUDE.md, 'the six questions', Q6). Every refusal below pins the
+  (AGENTS.md, 'the six questions', Q6). Every refusal below pins the
   `:reason` literal, and every refusal is paired with the same op and
   the same governor verdict at a phase that ALLOWS it, so a gate that
   simply always held could not pass."
